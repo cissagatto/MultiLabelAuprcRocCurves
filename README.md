@@ -5,7 +5,7 @@ This repository provides code and explanations for computing AUPRC (Area Under t
 📘 Please refer to the file multilabel_auprc_roc.pdf - a detailed tutorial covering the theory and practical implementation of ROC and AUPRC curves in multilabel settings.
 
 *Contents*
-- Example code for computing ROC and AUPRC metrics
+- Example code for computing ROC and AUPRC metrics (example.py in src!)
 - Visualization scripts for multilabel evaluation
 - Tutorial PDF with theoretical background and practical examples
 
