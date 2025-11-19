@@ -35,10 +35,13 @@
 #                                                                            #
 ##############################################################################
 
+
+import sys
+import platform
 import os
+import ml_auprc_roc as ml
 import numpy as np
 import pandas as pd
-from src.ml_auprc_roc import *
 
 
 # ----------------------------------------------- #
@@ -48,7 +51,7 @@ from src.ml_auprc_roc import *
 true = pd.read_csv("~/MultiLabelAuprcRocCurves/data/Split-1/y_true.csv")
 pred = pd.read_csv("~/MultiLabelAuprcRocCurves/data/Split-1/y_proba.csv")
 
-fpr_macro, tpr_macro, macro_auc, macro_auc_interp, macro_df = robust_macro_roc_auc(true, pred, verbose=False)
+fpr_macro, tpr_macro, macro_auc, macro_auc_interp, macro_df = ml.robust_macro_roc_auc(true, pred, verbose=False)
 print(f"Macro AUC (mean): {macro_auc:.4f}")
 print(f"Macro AUC (interpolated): {macro_auc_interp:.4f}")
 print(macro_df[["Label", "AUC"]])
@@ -56,38 +59,38 @@ print(fpr_macro)
 print(tpr_macro)
 
 
-fpr_micro, tpr_micro, auc_micro = robust_micro_roc_auc(true, pred, verbose=False)
+fpr_micro, tpr_micro, auc_micro = ml.robust_micro_roc_auc(true, pred, verbose=False)
 print(f"Micro-average AUC: {auc_micro:.4f}")
 print(fpr_micro)
 print(tpr_micro)
 
 
-fpr_w, tpr_w, auc_weighted, auc_df = robust_weighted_roc_auc(true, pred, verbose=False)
+fpr_w, tpr_w, auc_weighted, auc_df = ml.robust_weighted_roc_auc(true, pred, verbose=False)
 print(f"Weighted ROC-AUC: {auc_weighted:.4f}")
 print(auc_df[["Label", "AUC", "Support", "Weight"]])
 
 
-sample_auc_df, samples_auc_mean = robust_sample_roc_auc(true, pred, verbose=False)
+sample_auc_df, samples_auc_mean = ml.robust_sample_roc_auc(true, pred, verbose=False)
 print(f"Samples average AUC = {samples_auc_mean:.4f}")
 print(sample_auc_df[["Sample", "AUC"]])
 
-plot_macro_roc(
+ml.plot_macro_roc(
     fpr_macro, tpr_macro,
     macro_auc, macro_auc_interp, macro_df,
     show = True
 )
 
-plot_micro_roc(
+ml.plot_micro_roc(
     fpr_micro, tpr_micro, auc_micro, 
         show = True
 )
 
-plot_weighted_roc(
+ml.plot_weighted_roc(
     fpr_w, tpr_w, auc_weighted, auc_df,
     show = True
 )
 
-plot_samples_auc(
+ml.plot_samples_auc(
     sample_auc_df,
     show = True
 )
@@ -114,33 +117,33 @@ for fold in range(1, 11):
     pred = pd.read_csv(os.path.join(data_path, f"Split-{fold}/y_proba.csv"))
 
     # === Macro ===
-    fpr_macro, tpr_macro, macro_auc, macro_auc_interp, macro_df = robust_macro_roc_auc(true, pred, verbose=True)
+    fpr_macro, tpr_macro, macro_auc, macro_auc_interp, macro_df = ml.robust_macro_roc_auc(true, pred, verbose=True)
     results_macro.append([fold, macro_auc, macro_auc_interp])
-    plot_macro_roc(
+    ml.plot_macro_roc(
         fpr_macro, tpr_macro, macro_auc, macro_auc_interp, macro_df,
         save_path=os.path.join(plots_path, f"macro_fold{fold}.pdf")
     )
 
     # === Micro ===
-    fpr_micro, tpr_micro, auc_micro = robust_micro_roc_auc(true, pred, verbose=True)
+    fpr_micro, tpr_micro, auc_micro = ml.robust_micro_roc_auc(true, pred, verbose=True)
     results_micro.append([fold, auc_micro])
-    plot_micro_roc(
+    ml.plot_micro_roc(
         fpr_micro, tpr_micro, auc_micro,
         save_path=os.path.join(plots_path, f"micro_fold{fold}.pdf")
     )
 
     # === Weighted ===
-    fpr_w, tpr_w, auc_weighted, auc_df = robust_weighted_roc_auc(true, pred, verbose=True)
+    fpr_w, tpr_w, auc_weighted, auc_df = ml.robust_weighted_roc_auc(true, pred, verbose=True)
     results_weighted.append([fold, auc_weighted])
-    plot_weighted_roc(
+    ml.plot_weighted_roc(
         fpr_w, tpr_w, auc_weighted, auc_df,
         save_path=os.path.join(plots_path, f"weighted_fold{fold}.pdf")
     )
 
     # === Samples ===
-    sample_auc_df, samples_auc_mean = robust_sample_roc_auc(true, pred, verbose=True)
+    sample_auc_df, samples_auc_mean = ml.robust_sample_roc_auc(true, pred, verbose=True)
     results_samples.append([fold, samples_auc_mean])
-    plot_samples_auc(
+    ml.plot_samples_auc(
         sample_auc_df,
         save_path=os.path.join(plots_path, f"samples_fold{fold}.pdf")
     )
@@ -165,5 +168,7 @@ summary.to_csv(summary_path, index=False)
 print("\nCross-validation concluída!")
 print(summary)
 print(f"\nResults saved in: {summary_path}")
+
+
 
 
